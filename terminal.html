@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>$ERROR Academy // Programming Simulation</title>
+<title>$ERROR // Programming</title>
 <meta name="theme-color" content="#000000" />
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
@@ -72,7 +72,7 @@ canvas{position:fixed;inset:0;z-index:1;opacity:.11;pointer-events:none}.noise{p
 (_)-(_)</div>
     <h1>$ERROR ACADEMY</h1>
     <p>Hybrid cinematic programming simulator. Learn logic, decoding, patterns, terminal discipline, and problem solving inside a fictional safe lab. No real targets. No intrusion. Only education.</p>
-    <button class="start" onclick="startGame()">ENTER PROGRAMMING SIMULATION</button>
+    <button class="start" id="startBtn">ENTER PROGRAMMING SIMULATION</button>
   </div>
 </div>
 
@@ -156,10 +156,38 @@ function makePuzzle(){
 function showPuzzle(){if(!puzzle)puzzle=makePuzzle();htmlBlock(puzzle.title,`${puzzle.task}<br><br><span class="dim">Submit with: answer &lt;value&gt;</span>`);logFeed('challenge generated')}
 function next(){puzzle=makePuzzle();update();showPuzzle()}
 function update(){levelEl.textContent=level;let nextXP=250+level*30;xpEl.textContent=`${xp} / ${nextXP}`;streakEl.textContent=streak;rankEl.textContent=ranks[Math.min(ranks.length-1,Math.floor(level/5))];bar.style.width=Math.min(100,(xp%nextXP)/nextXP*100)+'%'}
-function startGame(){document.getElementById('intro').style.display='none';boot()}
+function startGame(){
+  const intro=document.getElementById('intro');
+  if(intro){intro.style.display='none';}
+  boot();
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const btn=document.getElementById('startBtn');
+  if(btn){
+    btn.addEventListener('click',startGame);
+  }
+});
 function boot(){['boot --mode endless-academy','[safe lab initialized]','[no real systems connected]','[learning path loaded]','Welcome to $ERROR Academy. The goal is to feel cinematic while learning programming logic.','Type help, lesson, scan, hint, or answer <value>.'].forEach((l,i)=>setTimeout(()=>print(i===0?'student@glitch:~$ '+l:l,i===0?'sys':i===2?'warn':i===5?'dim':'ok'),i*180));['academy system online','safe environment ready','student connected','ready for input...'].forEach((l,i)=>setTimeout(()=>logFeed(l),i*220));setTimeout(()=>{cmd.disabled=false;cmd.focus();next()},1250)}
 function quick(v){cmd.value=v;cmd.focus();handle()}
-& clean.includes('=') && !clean.includes('==') && !clean.includes('===')) report.push('⚠ Inside if statements, use == or === for comparison, not single =.');
+function countChar(text,ch){return text.split(ch).length-1}
+function analyzeCode(code){
+  const clean=code.trim();
+  const low=clean.toLowerCase();
+  const report=[];
+  if(!clean){return ['No code detected. Use: analyze let total = 4 + 5;']}
+  report.push('AI MENTOR REPORT // local educational analyzer');
+  report.push('────────────────────────────────────────');
+  if(low.includes('let ') || low.includes('const ') || low.includes('var ')) report.push('✓ Variable declaration detected. Good start.');
+  if(low.includes('function ') || low.includes('=>')) report.push('✓ Function structure detected. This makes code reusable.');
+  if(low.includes('if(') || low.includes('if (')) report.push('✓ Conditional logic detected. The program can make decisions.');
+  if(low.includes('for(') || low.includes('for (') || low.includes('while(') || low.includes('while (')) report.push('✓ Loop detected. This can repeat actions automatically.');
+  if(low.includes('console.log')) report.push('✓ Output command detected. Useful for debugging.');
+  if(clean.includes('=;') || clean.includes('+ ;') || clean.includes('+;') || clean.includes('- ;') || clean.includes('* ;') || clean.includes('/ ;')) report.push('⚠ Possible missing value. Check incomplete math or assignment.');
+  if(countChar(clean,'(')!==countChar(clean,')')) report.push('⚠ Parentheses mismatch detected. Count opening and closing parentheses.');
+  if(countChar(clean,'{')!==countChar(clean,'}')) report.push('⚠ Braces mismatch detected. Blocks need matching { and }.');
+  if(countChar(clean,'[')!==countChar(clean,']')) report.push('⚠ Brackets mismatch detected. Arrays need matching [ and ].');
+  if((low.includes('if(') || low.includes('if (')) && clean.includes('=') && !clean.includes('==') && !clean.includes('===')) report.push('⚠ Inside if statements, use == or === for comparison, not single =.');
   if(low.includes('var ')) report.push('Suggestion: prefer let or const instead of var for modern JavaScript.');
   if((low.includes('let ') || low.includes('const ') || low.includes('console.log')) && !clean.endsWith(';') && !clean.endsWith('}')) report.push('Suggestion: add a semicolon at the end for cleaner style.');
   let complexity=0;
@@ -189,7 +217,8 @@ if(v==='ai'){print('AI MENTOR ONLINE // local code analyzer ready','ok');print('
 if(v==='example'){print('Example commands:','dim');print('analyze let total = 4 + ;','sys');print('analyze const score = 10 + 5;','sys');print('explain if(score > 10){ console.log("level up"); }','sys');return}
 if(v.startsWith('analyze ')){const code=raw.slice(8);analyzeCode(code).forEach(l=>print(l,l.startsWith('⚠')?'warn':l.startsWith('✓')?'sys':l.startsWith('AI')?'ok':'dim'));logFeed('AI mentor analyzed code');return}
 if(v.startsWith('explain ')){const code=raw.slice(8);explainCode(code).forEach((l,i)=>print(l,i===0?'ok':'dim'));logFeed('AI mentor explained code');return}
-if(v==='clear'){screen.innerHTML='';return}if(v==='status'){print(`LEVEL ${level} // XP ${xp} // STREAK ${streak} // RANK ${rankEl.textContent}`,'dim');return}if(v==='lesson'){const box=document.createElement('div');box.className='lesson-box';box.textContent=puzzle?puzzle.lesson:'No active module yet. Type scan.';screen.appendChild(box);screen.scrollTop=screen.scrollHeight;return}if(v==='scan'){showPuzzle();return}if(v==='hint'){print(puzzle?'HINT: '+puzzle.hint:'No active challenge. Type scan.','warn');return}const ans=v.startsWith('answer ')?v.slice(7):v;if(!puzzle){print('No active challenge. Type scan.','warn');return}if(puzzle.answers.includes(ans)){document.body.classList.add('flash','success-pulse');setTimeout(()=>document.body.classList.remove('flash','success-pulse'),650);let gain=100+level*20+streak*15;xp+=gain;streak++;print(`ACCESS GRANTED // +${gain} XP // module complete`,'ok');logFeed('module completed');level++;setTimeout(next,500)}else{streak=0;print('ACCESS DENIED // incorrect output. Use hint or less('keydown',e=>{if(e.key==='Enter')handle()});window.addEventListener('click',()=>cmd.focus());
+if(v==='clear'){screen.innerHTML='';return}if(v==='status'){print(`LEVEL ${level} // XP ${xp} // STREAK ${streak} // RANK ${rankEl.textContent}`,'dim');return}if(v==='lesson'){const box=document.createElement('div');box.className='lesson-box';box.textContent=puzzle?puzzle.lesson:'No active module yet. Type scan.';screen.appendChild(box);screen.scrollTop=screen.scrollHeight;return}if(v==='scan'){showPuzzle();return}if(v==='hint'){print(puzzle?'HINT: '+puzzle.hint:'No active challenge. Type scan.','warn');return}const ans=v.startsWith('answer ')?v.slice(7):v;if(!puzzle){print('No active challenge. Type scan.','warn');return}if(puzzle.answers.includes(ans)){document.body.classList.add('flash','success-pulse');setTimeout(()=>document.body.classList.remove('flash','success-pulse'),650);let gain=100+level*20+streak*15;xp+=gain;streak++;print(`ACCESS GRANTED // +${gain} XP // module complete`,'ok');logFeed('module completed');level++;setTimeout(next,500)}else{streak=0;print('ACCESS DENIED // incorrect output. Use hint or lesson.','bad');logFeed('incorrect output detected');document.body.classList.add('error-pulse');setTimeout(()=>document.body.classList.remove('error-pulse'),650);document.querySelector('.terminal').classList.add('shake');setTimeout(()=>document.querySelector('.terminal').classList.remove('shake'),450);update()}}
+cmd.addEventListener('keydown',e=>{if(e.key==='Enter')handle()});window.addEventListener('click',()=>cmd.focus());
 
 const canvas=document.getElementById('matrix'),ctx=canvas.getContext('2d');function size(){canvas.width=innerWidth;canvas.height=innerHeight}size();addEventListener('resize',size);const chars='01$ERRORPROGRAMMINGSAFELOGIC{}[]<>/\\░▒▓█';let font=15,drops=[];setInterval(()=>{let cols=Math.floor(canvas.width/font);while(drops.length<cols)drops.push(1);ctx.fillStyle='rgba(0,0,0,.08)';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='rgba(0,255,65,.82)';ctx.font=font+'px Share Tech Mono';for(let i=0;i<cols;i++){let t=chars[Math.floor(Math.random()*chars.length)];ctx.fillText(t,i*font,drops[i]*font);if(drops[i]*font>canvas.height&&Math.random()>.975)drops[i]=0;drops[i]++}},45);
 </script>
